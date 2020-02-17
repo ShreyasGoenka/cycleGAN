@@ -73,6 +73,7 @@ if __name__ == '__main__':
         #     model.save_networks('latest')
         #     model.save_networks(epoch)
 
-        print(model.get_current_losses())
+        losses = model.get_current_losses()
+        print("loss ", "\nG: ", losses['G_A']+losses['G_B'], "\nD: ", losses['D_A']+losses['D_B'], "\ncycle ", losses['cycle_A']+losses['cycle_B'])
         print('End of epoch %d / %d \t Time Taken: %d sec' % (epoch, opt.n_epochs + opt.n_epochs_decay, time.time() - epoch_start_time))
         model.update_learning_rate()                     # update learning rates at the end of every epoch.
