@@ -53,6 +53,8 @@ if __name__ == '__main__':
                 cyclea.append(model.loss_cycle_B)
                 # print(losses)
 
+            total_iters += 1
+
 
 
             # if total_iters % opt.print_freq == 0:    # print training losses and save logging information to the disk

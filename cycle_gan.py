@@ -116,7 +116,8 @@ class CycleGAN():
 		pred_real = netD(real)
 		loss_D_real = self.criterionGAN(pred_real, True)
 		# Fake
-		pred_fake = netD(fake.detach())
+		# pred_fake = netD(fake.detach())
+		pred_fake = netD(fake)
 		loss_D_fake = self.criterionGAN(pred_fake, False)
 		# Combined loss and calculate gradients
 		loss_D = (loss_D_real + loss_D_fake) * 0.5
@@ -125,13 +126,16 @@ class CycleGAN():
 
 	def backward_D_A(self):
 		"""Calculate GAN loss for discriminator D_A"""
-		fake_B = self.fake_B_pool.query(self.fake_B)
-		self.loss_D_A = self.backward_D_basic(self.netD_A, self.real_B, fake_B)
+		# fake_B = self.fake_B_pool.query(self.fake_B)
+		# self.loss_D_A = self.backward_D_basic(self.netD_A, self.real_B, fake_B)
+		self.loss_D_A = self.backward_D_basic(self.netD_A, self.real_B, self.fake_B)
 
 	def backward_D_B(self):
 		"""Calculate GAN loss for discriminator D_B"""
-		fake_A = self.fake_A_pool.query(self.fake_A)
-		self.loss_D_B = self.backward_D_basic(self.netD_B, self.real_A, fake_A)
+		# fake_A = self.fake_A_pool.query(self.fake_A)
+		# self.loss_D_B = self.backward_D_basic(self.netD_B, self.real_A, fake_A)
+		self.loss_D_B = self.backward_D_basic(self.netD_B, self.real_A, self.fake_A)
+
 
 
 	def optimize_parameters(self):
