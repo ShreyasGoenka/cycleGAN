@@ -58,8 +58,10 @@ class CycleGAN():
 
 			self.criterionCycle = torch.nn.L1Loss()
 
-			self.optimizer_G = torch.optim.Adam(itertools.chain(self.netG_A.parameters(), self.netG_B.parameters()), lr=self.lr, betas=(self.beta1, 0.999))
-			self.optimizer_D = torch.optim.Adam(itertools.chain(self.netD_A.parameters(), self.netD_B.parameters()), lr=self.lr, betas=(self.beta1, 0.999))
+			# self.optimizer_G = torch.optim.Adam(itertools.chain(self.netG_A.parameters(), self.netG_B.parameters()), lr=self.lr, betas=(self.beta1, 0.999))
+			# self.optimizer_D = torch.optim.Adam(itertools.chain(self.netD_A.parameters(), self.netD_B.parameters()), lr=self.lr, betas=(self.beta1, 0.999))
+			self.optimizer_G = torch.optim.SGD(itertools.chain(self.netG_A.parameters(), self.netG_B.parameters()), lr = 0.0001)
+			self.optimizer_D = torch.optim.SGD(itertools.chain(self.netD_A.parameters(), self.netD_B.parameters()), lr = 0.0001)
 			self.optimizers.append(self.optimizer_G)
 			self.optimizers.append(self.optimizer_D)
 
@@ -101,6 +103,7 @@ class CycleGAN():
 		self.loss_G = self.loss_G_A + self.loss_G_B + self.loss_cycle_A + self.loss_cycle_B
 		self.loss_G.backward()
 
+
 	def backward_D_basic(self, netD, real, fake):
 		"""Calculate GAN loss for the discriminator
 
@@ -116,7 +119,7 @@ class CycleGAN():
 		pred_real = netD(real)
 		loss_D_real = self.criterionGAN(pred_real, True)
 		# Fake
-		# pred_fake = netD(fake.detach())
+		pred_fake = netD(fake.detach())
 		pred_fake = netD(fake)
 		loss_D_fake = self.criterionGAN(pred_fake, False)
 		# Combined loss and calculate gradients
@@ -126,15 +129,15 @@ class CycleGAN():
 
 	def backward_D_A(self):
 		"""Calculate GAN loss for discriminator D_A"""
-		# fake_B = self.fake_B_pool.query(self.fake_B)
-		# self.loss_D_A = self.backward_D_basic(self.netD_A, self.real_B, fake_B)
-		self.loss_D_A = self.backward_D_basic(self.netD_A, self.real_B, self.fake_B)
+		fake_B = self.fake_B_pool.query(self.fake_B)
+		self.loss_D_A = self.backward_D_basic(self.netD_A, self.real_B, fake_B)
+		# self.loss_D_A = self.backward_D_basic(self.netD_A, self.real_B, self.fake_B)
 
 	def backward_D_B(self):
 		"""Calculate GAN loss for discriminator D_B"""
-		# fake_A = self.fake_A_pool.query(self.fake_A)
-		# self.loss_D_B = self.backward_D_basic(self.netD_B, self.real_A, fake_A)
-		self.loss_D_B = self.backward_D_basic(self.netD_B, self.real_A, self.fake_A)
+		fake_A = self.fake_A_pool.query(self.fake_A)
+		self.loss_D_B = self.backward_D_basic(self.netD_B, self.real_A, fake_A)
+		# self.loss_D_B = self.backward_D_basic(self.netD_B, self.real_A, self.fake_A)
 
 
 
@@ -145,8 +148,14 @@ class CycleGAN():
 		# G_A and G_B
 		self.set_requires_grad([self.netD_A, self.netD_B], False)  # Ds require no gradients when optimizing Gs
 		self.optimizer_G.zero_grad()  # set G_A and G_B's gradients to zero
+		# print("before back wt.grad: ", self.netG_A.fc1.weight.grad)
 		self.backward_G()             # calculate gradients for G_A and G_B
+		# print("before step wt ", self.netG_A.fc1.weight)
+		# print(self.netG_A.fc1.weight.shape)
+		# print(self.netG_A.fc1.weight.grad.shape)
 		self.optimizer_G.step()       # update G_A and G_B's weights
+		# print("after back wt.grad: ", self.netG_A.fc1.weight.grad)
+		# print("after step wt ", self.netG_A.fc1.weight)	
 		# D_A and D_B
 		self.set_requires_grad([self.netD_A, self.netD_B], True)
 		self.optimizer_D.zero_grad()   # set D_A and D_B's gradients to zero

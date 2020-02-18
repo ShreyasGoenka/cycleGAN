@@ -14,7 +14,7 @@ class Office31(Dataset):
 		self.dataB = np.genfromtxt(csvB, delimiter=',')
 		self.featuresB = torch.tensor(self.dataB[:,:2048]).float()
 
-		print("SELF dataA type", self.featuresA)
+		# print("SELF dataA type", self.featuresA)
 		self.labelsB = self.dataB[:,2048]
 
 	def __len__(self):

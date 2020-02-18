@@ -44,6 +44,7 @@ if __name__ == '__main__':
             model.optimize_parameters()   # calculate loss functions, get gradients, update network weights
 
             if total_iters % print_freq == 0:   # display images on visdom and save images to a HTML file
+                print("ITER: ", total_iters)
                 losses = model.get_current_losses()
                 ga.append(model.loss_G_A)
                 gb.append(model.loss_G_B)
@@ -51,7 +52,8 @@ if __name__ == '__main__':
                 db.append(model.loss_D_B)
                 cyclea.append(model.loss_cycle_A)
                 cyclea.append(model.loss_cycle_B)
-                # print(losses)
+                print("loss ", "\nG: ", losses['G_A']+losses['G_B'], "\nD: ", losses['D_A']+losses['D_B'], "\ncycle ", losses['cycle_A']+losses['cycle_B'])
+
 
             total_iters += 1
 
