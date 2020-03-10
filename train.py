@@ -1,12 +1,14 @@
 import time
 import torch
+import pickle
+import sys
 
 from dataset import Office31 
 from cycle_gan import CycleGAN
 
 num_epochs = 10
 print_freq = 50
-# save_latest_freq = 1500
+save_latest_freq = 1500
 
 ga = []
 gb = []
@@ -19,11 +21,20 @@ cycleb = []
 if __name__ == '__main__':
     
     dataset = Office31('./office31_features/amazon_amazon.csv', './office31_features/amazon_dslr.csv')
-    model = CycleGAN()
 
-    print("Model Init")
-    print(model.netG_A)
-    print(model.netD_A)
+    if sys.argv[1] == "init":
+        model = CycleGAN()
+        print("Model Init")
+        print(model.netG_A)
+        print(model.netD_A)
+
+    elif sys.argv[1] == "cont":
+        with open('latest_model.pkl') as mymodel:
+            model = pickle.load(mymodel)
+
+    else:
+        print("pass arg for model")
+        assert 0
 
     total_iters = 0                # the total number of training iterations
 
@@ -57,6 +68,9 @@ if __name__ == '__main__':
 
             total_iters += 1
 
+            if total_iters % save_latest_freq == 0:
+                with open('latest_model.pkl', 'wb') as model_file:
+                    pickle.dump(model, model_file, pickle.HIGHEST_PROTOCOL)
 
 
             # if total_iters % opt.print_freq == 0:    # print training losses and save logging information to the disk

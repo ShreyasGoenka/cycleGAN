@@ -54,7 +54,8 @@ class CycleGAN():
 			self.netD_A = networks.SimpleDiscriminator().to(self.device)
 			self.netD_B = networks.SimpleDiscriminator().to(self.device)
 
-			self.criterionGAN = loss.GANLoss('lsgan').to(self.device)  # define GAN loss.
+			# self.criterionGAN = loss.GANLoss('lsgan').to(self.device)  # define GAN loss.
+			self.criterionGAN = loss.GANLoss('vanilla').to(self.device)
 
 			self.criterionCycle = torch.nn.L1Loss()
 
@@ -64,6 +65,9 @@ class CycleGAN():
 			self.optimizer_D = torch.optim.SGD(itertools.chain(self.netD_A.parameters(), self.netD_B.parameters()), lr = 0.0001)
 			self.optimizers.append(self.optimizer_G)
 			self.optimizers.append(self.optimizer_D)
+
+		self.count = 0
+		self.ratio = 1
 
 
 	def forward(self):
@@ -157,11 +161,14 @@ class CycleGAN():
 		# print("after back wt.grad: ", self.netG_A.fc1.weight.grad)
 		# print("after step wt ", self.netG_A.fc1.weight)	
 		# D_A and D_B
-		self.set_requires_grad([self.netD_A, self.netD_B], True)
-		self.optimizer_D.zero_grad()   # set D_A and D_B's gradients to zero
-		self.backward_D_A()      # calculate gradients for D_A
-		self.backward_D_B()      # calculate graidents for D_B
-		self.optimizer_D.step()  # update D_A and D_B's weights
+		if self.count % self.ratio == 0:
+			self.set_requires_grad([self.netD_A, self.netD_B], True)
+			self.optimizer_D.zero_grad()   # set D_A and D_B's gradients to zero
+			self.backward_D_A()      # calculate gradients for D_A
+			self.backward_D_B()      # calculate graidents for D_B
+			self.optimizer_D.step()  # update D_A and D_B's weights
+
+		self.count += 1
 
 	def get_current_losses(self):
 		"""Return traning losses / errors. train.py will print out these errors on console, and save them to a file"""
