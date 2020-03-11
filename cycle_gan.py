@@ -42,7 +42,7 @@ class CycleGAN():
 		# self.netG_A = networks.SimpleGenerator().to(self.device)
 		# self.netG_B = networks.SimpleGenerator().to(self.device)
 		self.netG_A = networks.DropoutG().to(self.device)
-		self.netG_B = networks.DropoutG().to(self.device
+		self.netG_B = networks.DropoutG().to(self.device)
 
 		if self.isTrain:
 			self.model_names = ['G_A', 'G_B', 'D_A', 'D_B']

@@ -2,6 +2,7 @@ import time
 import torch
 import pickle
 import sys
+import numpy as np
 
 from dataset import Office31 
 from cycle_gan import CycleGAN
@@ -53,17 +54,23 @@ if __name__ == '__main__':
 
             model.set_input(data)         # unpack data from dataset and apply preprocessing
             model.optimize_parameters()   # calculate loss functions, get gradients, update network weights
+            ga.append(model.loss_G_A)
+            gb.append(model.loss_G_B)
+            da.append(model.loss_D_A)
+            db.append(model.loss_D_B)
+            cyclea.append(model.loss_cycle_A)
+            cycleb.append(model.loss_cycle_B)
 
             if total_iters % print_freq == 0:   # display images on visdom and save images to a HTML file
                 print("ITER: ", total_iters)
-                losses = model.get_current_losses()
-                ga.append(model.loss_G_A)
-                gb.append(model.loss_G_B)
-                da.append(model.loss_D_A)
-                db.append(model.loss_D_B)
-                cyclea.append(model.loss_cycle_A)
-                cyclea.append(model.loss_cycle_B)
-                print("loss ", "\nG: ", losses['G_A']+losses['G_B'], "\nD: ", losses['D_A']+losses['D_B'], "\ncycle ", losses['cycle_A']+losses['cycle_B'])
+                # losses = model.get_current_losses()
+
+                print("loss ", "\nGA: ", np.mean(ga),
+                                "\nGB: ", np.mean(gb),
+                                "\nDA: ", np.mean(da),
+                                "\nDB: ", np.mean(db),
+                                "\ncycleA: ", np.mean(cyclea),
+                                "\ncycleB: ", np.mean(cycleb))
 
 
             total_iters += 1
