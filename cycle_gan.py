@@ -39,8 +39,10 @@ class CycleGAN():
 		self.model_names = []
 		self.optimizers = []
 
-		self.netG_A = networks.SimpleGenerator().to(self.device)
-		self.netG_B = networks.SimpleGenerator().to(self.device)
+		# self.netG_A = networks.SimpleGenerator().to(self.device)
+		# self.netG_B = networks.SimpleGenerator().to(self.device)
+		self.netG_A = networks.DropoutG().to(self.device)
+		self.netG_B = networks.DropoutG().to(self.device
 
 		if self.isTrain:
 			self.model_names = ['G_A', 'G_B', 'D_A', 'D_B']
@@ -59,9 +61,9 @@ class CycleGAN():
 
 			self.criterionCycle = torch.nn.L1Loss()
 
-			# self.optimizer_G = torch.optim.Adam(itertools.chain(self.netG_A.parameters(), self.netG_B.parameters()), lr=self.lr, betas=(self.beta1, 0.999))
+			self.optimizer_G = torch.optim.Adam(itertools.chain(self.netG_A.parameters(), self.netG_B.parameters()), lr=self.lr, betas=(self.beta1, 0.999))
 			# self.optimizer_D = torch.optim.Adam(itertools.chain(self.netD_A.parameters(), self.netD_B.parameters()), lr=self.lr, betas=(self.beta1, 0.999))
-			self.optimizer_G = torch.optim.SGD(itertools.chain(self.netG_A.parameters(), self.netG_B.parameters()), lr = 0.0001)
+			# self.optimizer_G = torch.optim.SGD(itertools.chain(self.netG_A.parameters(), self.netG_B.parameters()), lr = 0.0001)
 			self.optimizer_D = torch.optim.SGD(itertools.chain(self.netD_A.parameters(), self.netD_B.parameters()), lr = 0.0001)
 			self.optimizers.append(self.optimizer_G)
 			self.optimizers.append(self.optimizer_D)
